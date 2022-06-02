@@ -516,22 +516,28 @@ $(B)/$(MOD)/ui$(SHLIBNAME): $(UIOBJ)
 ## GAME MODULE RULES
 #############################################################################
 
-$(B)/$(MOD)/cgame/bg_%.o: $(QADIR)/bg_%.c
+ifeq ($(PLATFORM),qvms)
+OBJEXT := .asm
+else
+OBJEXT := .o
+endif
+
+$(B)/$(MOD)/cgame/bg_%$(OBJEXT): $(QADIR)/bg_%.c
 	$(DO_CGAME_CC)
 
-$(B)/$(MOD)/cgame/q_%.o: $(QADIR)/q_%.c
+$(B)/$(MOD)/cgame/q_%$(OBJEXT): $(QADIR)/q_%.c
 	$(DO_CGAME_CC)
 
-$(B)/$(MOD)/cgame/%.o: $(CGDIR)/%.c
+$(B)/$(MOD)/cgame/%$(OBJEXT): $(CGDIR)/%.c
 	$(DO_CGAME_CC)
 
-$(B)/$(MOD)/game/%.o: $(QADIR)/%.c
+$(B)/$(MOD)/game/%$(OBJEXT): $(QADIR)/%.c
 	$(DO_GAME_CC)
 
-$(B)/$(MOD)/ui/bg_%.o: $(QADIR)/bg_%.c
+$(B)/$(MOD)/ui/bg_%$(OBJEXT): $(QADIR)/bg_%.c
 	$(DO_UI_CC)
 
-$(B)/$(MOD)/ui/%.o: $(UIDIR)/%.c
+$(B)/$(MOD)/ui/%$(OBJEXT): $(UIDIR)/%.c
 	$(DO_UI_CC)
 
 #############################################################################
