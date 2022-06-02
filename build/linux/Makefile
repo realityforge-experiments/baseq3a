@@ -398,7 +398,7 @@ endif
 
 $(B)/$(MOD)/cgame$(SHLIBNAME): $(CGOBJ)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(CGOBJ)
+	$(Q)$(LD) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(CGOBJ)
 
 #############################################################################
 ## BASEQ3 GAME
@@ -450,7 +450,7 @@ endif
 
 $(B)/$(MOD)/qagame$(SHLIBNAME): $(QAOBJ)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(QAOBJ)
+	$(Q)$(LD) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(QAOBJ)
 
 #############################################################################
 ## BASEQ3 UI
@@ -510,7 +510,7 @@ endif
 
 $(B)/$(MOD)/ui$(SHLIBNAME): $(UIOBJ)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(UIOBJ)
+	$(Q)$(LD) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(UIOBJ)
 
 #############################################################################
 ## GAME MODULE RULES
