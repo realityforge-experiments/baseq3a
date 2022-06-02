@@ -300,8 +300,8 @@ jobs:
           7z a -r baseq3a-all-x86_64.zip         ./windows-mingw-x86_64/*
           7z a -r baseq3a-all-x86_64.zip         ./windows-msvc-x86_64/*
           7z a -r baseq3a-all-x86_64.zip         ./windows-msvc-arm64/*
-          7z a -r baseq3a-all-x86_64.zip         ./linux-qvms/*
-          7z a -r baseq3a-qvms.zip              ./linux-qvms/*
+          7z a -r baseq3a-all-x86_64.zip         ./qvms-bytecode/*
+          7z a -r baseq3a-qvms.zip              ./qvms-bytecode/*
 #         7z a -r q3lcc-linux-aarch64.zip  ./linux-aarch64/*
 #         7z a -r q3lcc-linux-armv7.zip    ./linux-armv7/*
 
