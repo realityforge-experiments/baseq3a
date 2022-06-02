@@ -4,6 +4,7 @@
 # GNU Make required
 #
 
+LAST_MAKEFILE :=  $(lastword $(MAKEFILE_LIST))
 COMPILE_PLATFORM=$(shell uname | sed -e 's/_.*//' | tr '[:upper:]' '[:lower:]' | sed -e 's/\//_/g')
 COMPILE_ARCH=$(shell uname -m | sed -e 's/i.86/x86/' | sed -e 's/^arm.*/arm/')
 
@@ -110,6 +111,31 @@ LIB=lib
 
 INSTALL=install
 MKDIR=mkdir
+LD := $(CC)
+
+ifeq ($(PLATFORM),qvms)
+
+CC = ../../../q3lcc -v 
+LD = ../../../q3asm
+
+SHLIBCFLAGS := -DQ3_VM 
+SHLIBLDFLAGS := -vq3 -r -m -v 
+
+endif
+
+ifeq ($(PLATFORM),darwin)
+
+  BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes -pipe
+
+  OPTIMIZE = -O2 -fvisibility=hidden -fomit-frame-pointer # -ffast-math
+
+  SHLIBEXT         := dylib
+  SHLIBCFLAGS      := -fPIC -fvisibility=hidden -fno-common
+  SHLIBLDFLAGS     := -dynamiclib -rdynamic -shared $(LDFLAGS)
+
+  LIBS= -lm
+
+endif
 
 ifeq ($(PLATFORM),linux)
 
@@ -195,8 +221,12 @@ ifndef FULLBINEXT
   FULLBINEXT=.$(ARCH)$(BINEXT)
 endif
 
+ifneq ($(PLATFORM),qvms)
 ifndef SHLIBNAME
   SHLIBNAME=$(ARCH).$(SHLIBEXT)
+endif
+else
+SHLIBNAME := 
 endif
 
 TARGETS += \
@@ -218,10 +248,14 @@ else
   STRIP_FLAG = -s
 endif
 
+ifneq ($(PLATFORM),qvms)
+
 BASE_CFLAGS += -Wformat=2 -Wno-format-zero-length -Wformat-security -Wno-format-nonliteral
 BASE_CFLAGS += -Wstrict-aliasing=2 -Wmissing-format-attribute
 BASE_CFLAGS += -Wdisabled-optimization
 BASE_CFLAGS += -Werror-implicit-function-declaration
+
+endif
 
 ifeq ($(V),1)
 echo_cmd=@:
@@ -248,7 +282,7 @@ endef
 
 define DO_CGAME_CC
 $(echo_cmd) "CGAME_CC $<"
-$(Q)$(CC) $(MOD_CFLAGS) -DCGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZE) -o $@ -c $<
+$(Q)$(CC) $(MOD_CFLAGS) -DCGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZE) -o $@ -c build/../$<
 endef
 
 define DO_UI_CC
@@ -264,11 +298,11 @@ default: release
 all: debug release
 
 debug:
-	@$(MAKE) targets B=$(BD) CFLAGS="$(CFLAGS) $(BASE_CFLAGS)" \
+	@$(MAKE)  targets B=$(BD) CFLAGS="$(CFLAGS) $(BASE_CFLAGS)" \
 	  OPTIMIZE="$(DEBUG_CFLAGS)" V=$(V)
 
 release:
-	@$(MAKE) targets B=$(BR) CFLAGS="$(CFLAGS) $(BASE_CFLAGS)" \
+	@$(MAKE)  targets B=$(BR) CFLAGS="$(CFLAGS) $(BASE_CFLAGS)" \
 	  OPTIMIZE="-DNDEBUG $(OPTIMIZE)" V=$(V)
 
 # Create the build directories, check libraries and print out
@@ -312,7 +346,7 @@ targets: makedirs
 	@echo ""
 
 ifneq ($(TARGETS),)
-	@$(MAKE) $(TARGETS) V=$(V)
+	@$(MAKE)  $(TARGETS) V=$(V)
 endif
 
 makedirs:
@@ -353,10 +387,16 @@ CGOBJ_ = \
   $(B)/$(MOD)/cgame/cg_view.o \
   $(B)/$(MOD)/cgame/cg_weapons.o \
   \
-  $(B)/$(MOD)/game/q_math.o \
-  $(B)/$(MOD)/game/q_shared.o
+  $(B)/$(MOD)/cgame/q_math.o \
+  $(B)/$(MOD)/cgame/q_shared.o
 
-CGOBJ = $(CGOBJ_) $(B)/$(MOD)/cgame/cg_syscalls.o
+ifeq ($(PLATFORM),qvms)
+CGOBJ   = $(CGOBJ_:.o=.asm)
+CGOBJ_  = $(CGOBJ) $(CGDIR)/cg_syscalls.asm
+else
+CGOBJ_ += $(B)/$(MOD)/cgame/cg_syscalls.o
+CGOBJ   = $(CGOBJ_)
+endif
 
 $(B)/$(MOD)/cgame$(SHLIBNAME): $(CGOBJ)
 	$(echo_cmd) "LD $@"
@@ -404,7 +444,13 @@ QAOBJ_ = \
   $(B)/$(MOD)/game/q_math.o \
   $(B)/$(MOD)/game/q_shared.o
 
-QAOBJ = $(QAOBJ_) $(B)/$(MOD)/game/g_syscalls.o
+ifeq ($(PLATFORM),qvms)
+QAOBJ   = $(QAOBJ_:.o=.asm)
+QAOBJ_  = $(QAOBJ) $(QADIR)/g_syscalls.asm
+else
+QAOBJ_ += $(B)/$(MOD)/game/g_syscalls.o
+QAOBJ   = $(QAOBJ_) 
+endif
 
 $(B)/$(MOD)/qagame$(SHLIBNAME): $(QAOBJ)
 	$(echo_cmd) "LD $@"
@@ -460,7 +506,13 @@ UIOBJ_ = \
   $(B)/$(MOD)/game/q_math.o \
   $(B)/$(MOD)/game/q_shared.o
 
-UIOBJ = $(UIOBJ_) $(B)/$(MOD)/ui/ui_syscalls.o
+ifeq ($(PLATFORM),qvms)
+UIOBJ   = $(UIOBJ_:.o=.asm)
+UIOBJ_  = $(UIOBJ) $(UIDIR)/ui_syscalls.asm
+else
+UIOBJ_ += $(B)/$(MOD)/ui/ui_syscalls.o
+UIOBJ   = $(UIOBJ_)
+endif
 
 $(B)/$(MOD)/ui$(SHLIBNAME): $(UIOBJ)
 	$(echo_cmd) "LD $@"
