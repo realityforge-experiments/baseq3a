@@ -391,11 +391,9 @@ CGOBJ_ = \
   $(B)/$(MOD)/cgame/q_shared.o
 
 ifeq ($(PLATFORM),qvms)
-CGOBJ   = $(CGOBJ_:.o=.asm)
-CGOBJ_  = $(CGOBJ) $(CGDIR)/cg_syscalls.asm
+CGOBJ   = $(CGOBJ_:.o=.asm) $(CGDIR)/cg_syscalls.asm
 else
-CGOBJ_ += $(B)/$(MOD)/cgame/cg_syscalls.o
-CGOBJ   = $(CGOBJ_)
+CGOBJ   = $(CGOBJ_) $(B)/$(MOD)/cgame/cg_syscalls.o
 endif
 
 $(B)/$(MOD)/cgame$(SHLIBNAME): $(CGOBJ)
@@ -445,11 +443,9 @@ QAOBJ_ = \
   $(B)/$(MOD)/game/q_shared.o
 
 ifeq ($(PLATFORM),qvms)
-QAOBJ   = $(QAOBJ_:.o=.asm)
-QAOBJ_  = $(QAOBJ) $(QADIR)/g_syscalls.asm
+QAOBJ   = $(QAOBJ_:.o=.asm) $(QADIR)/g_syscalls.asm
 else
-QAOBJ_ += $(B)/$(MOD)/game/g_syscalls.o
-QAOBJ   = $(QAOBJ_) 
+QAOBJ   = $(QAOBJ_) $(B)/$(MOD)/game/g_syscalls.o
 endif
 
 $(B)/$(MOD)/qagame$(SHLIBNAME): $(QAOBJ)
@@ -507,11 +503,9 @@ UIOBJ_ = \
   $(B)/$(MOD)/game/q_shared.o
 
 ifeq ($(PLATFORM),qvms)
-UIOBJ   = $(UIOBJ_:.o=.asm)
-UIOBJ_  = $(UIOBJ) $(UIDIR)/ui_syscalls.asm
+UIOBJ   = $(UIOBJ_:.o=.asm) $(UIDIR)/ui_syscalls.asm
 else
-UIOBJ_ += $(B)/$(MOD)/ui/ui_syscalls.o
-UIOBJ   = $(UIOBJ_)
+UIOBJ   = $(UIOBJ_) $(B)/$(MOD)/ui/ui_syscalls.o
 endif
 
 $(B)/$(MOD)/ui$(SHLIBNAME): $(UIOBJ)
